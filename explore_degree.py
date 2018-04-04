@@ -4,12 +4,17 @@
 
 # the number of nodes in ALL 4 layers
 NUMBER_OF_NODES = 24818
+DRAW_PLOT_FLAG = False
 
 import csv
 from itertools import islice
 
-import numpy as np
 import networkx as nx
+import pandas as pd
+import matplotlib
+import matplotlib.pyplot as plt
+
+matplotlib.style.use('ggplot')
 
 def calculate_intersection(lst1, lst2):
     # taken from
@@ -118,11 +123,13 @@ with open(fname, 'w') as f:
     for i in range(NUMBER_OF_NODES):
         writer.writerow([(i+1), dl_g1[i], dl_g2[i], dl_g3[i]])
 
-# print the correlation coefficient matrices
-print("a2q with c2q")
-print(np.corrcoef(dl_g1, dl_g2))
-print("a2q with c2a")
-print(np.corrcoef(dl_g1, dl_g3))
-print("c2q with c2a")
-print(np.corrcoef(dl_g2, dl_g3))
+# print the correlation coefficient matrix
+df = pd.DataFrame({'a2q': dl_g1, 'c2q' : dl_g2, 'c2a' : dl_g3})
+print(df.corr())
+
+# draw the scatter matrix
+if DRAW_PLOT_FLAG:
+    pd.scatter_matrix(df, figsize=(6, 6))
+    plt.show()
+
 
