@@ -1,6 +1,8 @@
 
 # Created by https://www.gitignore.io/api/macos,python,windows,pycharm,pycharm+all,visualstudio,jupyternotebook,visualstudiocode
 
+*.csv
+
 ### JupyterNotebook ###
 .ipynb_checkpoints
 */.ipynb_checkpoints/*

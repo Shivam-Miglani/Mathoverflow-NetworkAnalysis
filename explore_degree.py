@@ -5,8 +5,11 @@
 # the number of nodes in ALL 4 layers
 NUMBER_OF_NODES = 24818
 
-import networkx as nx
+import csv
 from itertools import islice
+
+import numpy as np
+import networkx as nx
 
 def calculate_intersection(lst1, lst2):
     # taken from
@@ -86,4 +89,40 @@ r3 = float(x23) / float(n_top10)
 print("N(intersection_of_top10p_a2q_and_c2q)/N(top10p) : %f" % r1)
 print("N(intersection_of_top10p_a2q_and_c2a)/N(top10p) : %f" % r2)
 print("N(intersection_of_top10p_c2q_and_c2a)/N(top10p) : %f" % r3)
+
+# now let's dump the degree data of all layers
+# but first, let's clean our data first by adding nodes with zero degree
+dl_g1 = [0] * NUMBER_OF_NODES
+dl_g2 = [0] * NUMBER_OF_NODES
+dl_g3 = [0] * NUMBER_OF_NODES
+
+for i in range(NUMBER_OF_NODES):
+    val1 = deg_dict1.get(i+1)
+    val2 = deg_dict2.get(i+1)
+    val3 = deg_dict3.get(i+1)
+
+    if val1 is not None:
+        dl_g1[i] = deg_dict1.get(i+1)
+
+    if val2 is not None:
+        dl_g2[i] = deg_dict2.get(i+1)
+
+    if val3 is not None:
+        dl_g3[i] = deg_dict3.get(i+1)
+
+# write them to a CSV file
+fname = "degree.csv"
+with open(fname, 'w') as f:
+    writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
+    writer.writerow(['node_id', 'degree_a2q', 'degree_c2q', 'degree_c2a'])
+    for i in range(NUMBER_OF_NODES):
+        writer.writerow([(i+1), dl_g1[i], dl_g2[i], dl_g3[i]])
+
+# print the correlation coefficient matrices
+print("a2q with c2q")
+print(np.corrcoef(dl_g1, dl_g2))
+print("a2q with c2a")
+print(np.corrcoef(dl_g1, dl_g3))
+print("c2q with c2a")
+print(np.corrcoef(dl_g2, dl_g3))
 
