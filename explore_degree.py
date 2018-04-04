@@ -2,9 +2,11 @@
 
 # let's define some constants here
 
-# the number of nodes in ALL 4 layers
+# the number of nodes in ALL 3 layers
 NUMBER_OF_NODES = 24818
+# do we want to generate degree list in csv format?
 GENERATE_CSV_FLAG = False
+# do we want do draw some plots?
 DRAW_PLOT_FLAG = False
 
 import csv
@@ -116,8 +118,8 @@ for i in range(NUMBER_OF_NODES):
     if val3 is not None:
         dl_g3[i] = deg_dict3.get(i+1)
 
+# write them to a CSV file
 if GENERATE_CSV_FLAG:
-    # write them to a CSV file
     fname = "degree.csv"
     with open(fname, 'w') as f:
         writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
