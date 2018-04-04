@@ -4,6 +4,7 @@
 
 # the number of nodes in ALL 4 layers
 NUMBER_OF_NODES = 24818
+GENERATE_CSV_FLAG = False
 DRAW_PLOT_FLAG = False
 
 import csv
@@ -115,13 +116,14 @@ for i in range(NUMBER_OF_NODES):
     if val3 is not None:
         dl_g3[i] = deg_dict3.get(i+1)
 
-# write them to a CSV file
-fname = "degree.csv"
-with open(fname, 'w') as f:
-    writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
-    writer.writerow(['node_id', 'degree_a2q', 'degree_c2q', 'degree_c2a'])
-    for i in range(NUMBER_OF_NODES):
-        writer.writerow([(i+1), dl_g1[i], dl_g2[i], dl_g3[i]])
+if GENERATE_CSV_FLAG:
+    # write them to a CSV file
+    fname = "degree.csv"
+    with open(fname, 'w') as f:
+        writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
+        writer.writerow(['node_id', 'degree_a2q', 'degree_c2q', 'degree_c2a'])
+        for i in range(NUMBER_OF_NODES):
+            writer.writerow([(i+1), dl_g1[i], dl_g2[i], dl_g3[i]])
 
 # print the correlation coefficient matrix
 df = pd.DataFrame({'a2q': dl_g1, 'c2q' : dl_g2, 'c2a' : dl_g3})
@@ -131,5 +133,4 @@ print(df.corr())
 if DRAW_PLOT_FLAG:
     pd.scatter_matrix(df, figsize=(6, 6))
     plt.show()
-
 
