@@ -27,6 +27,16 @@ def calculate_intersection(lst1, lst2):
 
     return lst3
 
+def calculate_intersection3(lst1, lst2, lst3):
+    # taken from
+    # https://www.geeksforgeeks.org/python-intersection-two-lists/
+    temp = set(lst2)
+    lst4 = [value for value in lst1 if value in temp]
+    temp = set(lst3)
+    lst5 = [value for value in lst4 if value in temp]
+
+    return lst5
+
 def generate_graph_from_file(fname, graph_name=None):
     if graph_name is not None:
         G = nx.Graph(name=graph_name)
@@ -165,16 +175,21 @@ c12 = len(calculate_intersection(ordered_node_clust1, ordered_node_clust2))
 c13 = len(calculate_intersection(ordered_node_clust1, ordered_node_clust3))
 c23 = len(calculate_intersection(ordered_node_clust2, ordered_node_clust3))
 
+# calculate how many clustering coefficients are in the intersection among all graphs
+c_all = len(calculate_intersection3(ordered_node_clust1, ordered_node_clust2, ordered_node_clust3))
+
 # finally calculate the intersection rate in top 10% node in term of degree
 r_c1 = float(c12) / float(n_top10)
 r_c2 = float(c13) / float(n_top10)
 r_c3 = float(c23) / float(n_top10)
+r_c_all = float(c_all) / float(n_top10)
 
 # let's print the result
 print("\n##Clustering Coefficients Results\n")
 print("N(intersection_of_top10p_a2q_and_c2q)/N(top10p) : %f" % r_c1)
 print("N(intersection_of_top10p_a2q_and_c2a)/N(top10p) : %f" % r_c2)
 print("N(intersection_of_top10p_c2q_and_c2a)/N(top10p) : %f" % r_c3)
+print("N(intersection_of_top10p_all)/N(top10p) : %f" % r_c_all)
 
 # now let's dump the degree data of all layers
 # but first, let's clean our data first by adding nodes with zero degree
