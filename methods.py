@@ -181,5 +181,5 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=F
 
     # draw the scatter matrix of the given metric
     if draw_plot:
-        pd.scatter_matrix(mf, figsize=(6, 6))
+        pd.plotting.scatter_matrix(mf, figsize=(6, 6))
         plt.show()
