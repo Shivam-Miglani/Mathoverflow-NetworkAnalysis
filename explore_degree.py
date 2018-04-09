@@ -53,6 +53,7 @@ def get_degree_dictionary(G):
 
     return deg_dict
 
+
 ##### START HERE #####
 
 # let's build the graph from our dataset, they are on data/ directory
@@ -94,6 +95,7 @@ r2 = float(x13) / float(n_top10)
 r3 = float(x23) / float(n_top10)
 
 # let's print the result
+print("\n##Degree Results\n")
 print("N(intersection_of_top10p_a2q_and_c2q)/N(top10p) : %f" % r1)
 print("N(intersection_of_top10p_a2q_and_c2a)/N(top10p) : %f" % r2)
 print("N(intersection_of_top10p_c2q_and_c2a)/N(top10p) : %f" % r3)
@@ -136,3 +138,78 @@ if DRAW_PLOT_FLAG:
     pd.scatter_matrix(df, figsize=(6, 6))
     plt.show()
 
+###########################################
+## Clustering Coefficient Computations
+###########################################
+
+# get (unordered) clustering metrics for all node in dictionary format
+clust_dict1 = nx.clustering(G1)
+clust_dict2 = nx.clustering(G2)
+clust_dict3 = nx.clustering(G3)
+
+# now, we order the clustering coefficients descendingly (i.e. high clustering coeff first)
+ordered_node_clust1 = sorted(((value,key) for (key,value) in clust_dict1.items()), reverse=True)
+ordered_node_clust2 = sorted(((value,key) for (key,value) in clust_dict2.items()), reverse=True)
+ordered_node_clust3 = sorted(((value,key) for (key,value) in clust_dict3.items()), reverse=True)
+
+# calculate n of top 10%
+n_top10 = int(NUMBER_OF_NODES / 10)
+
+# slice our lists to be consisted of only top 10%
+ordered_node_clust1 = ordered_node_clust1[:n_top10]
+ordered_node_clust2 = ordered_node_clust2[:n_top10]
+ordered_node_clust3 = ordered_node_clust3[:n_top10]
+
+# calculate how many clustering coefficients are in the intersection between all pairs of graph
+c12 = len(calculate_intersection(ordered_node_clust1, ordered_node_clust2))
+c13 = len(calculate_intersection(ordered_node_clust1, ordered_node_clust3))
+c23 = len(calculate_intersection(ordered_node_clust2, ordered_node_clust3))
+
+# finally calculate the intersection rate in top 10% node in term of degree
+r_c1 = float(c12) / float(n_top10)
+r_c2 = float(c13) / float(n_top10)
+r_c3 = float(c23) / float(n_top10)
+
+# let's print the result
+print("\n##Clustering Coefficients Results\n")
+print("N(intersection_of_top10p_a2q_and_c2q)/N(top10p) : %f" % r_c1)
+print("N(intersection_of_top10p_a2q_and_c2a)/N(top10p) : %f" % r_c2)
+print("N(intersection_of_top10p_c2q_and_c2a)/N(top10p) : %f" % r_c3)
+
+# now let's dump the degree data of all layers
+# but first, let's clean our data first by adding nodes with zero degree
+cl_g1 = [0] * NUMBER_OF_NODES
+cl_g2 = [0] * NUMBER_OF_NODES
+cl_g3 = [0] * NUMBER_OF_NODES
+
+for i in range(NUMBER_OF_NODES):
+    val1 = clust_dict1.get(i+1)
+    val2 = clust_dict2.get(i+1)
+    val3 = clust_dict3.get(i+1)
+
+    if val1 is not None:
+        cl_g1[i] = clust_dict1.get(i+1)
+
+    if val2 is not None:
+        cl_g2[i] = clust_dict2.get(i+1)
+
+    if val3 is not None:
+        cl_g3[i] = clust_dict3.get(i+1)
+
+# write them to a CSV file
+if GENERATE_CSV_FLAG:
+    fname = "clustering.csv"
+    with open(fname, 'w') as f:
+        writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
+        writer.writerow(['node_id', 'clust_a2q', 'clust_c2q', 'clust_c2a'])
+        for i in range(NUMBER_OF_NODES):
+            writer.writerow([(i+1), cl_g1[i], cl_g2[i], cl_g3[i]])
+
+# print the correlation coefficient matrix
+c_df = pd.DataFrame({'a2q': cl_g1, 'c2q' : cl_g2, 'c2a' : cl_g3})
+print(c_df.corr())
+
+# draw the scatter matrix
+if DRAW_PLOT_FLAG:
+    pd.scatter_matrix(c_df, figsize=(6, 6))
+    plt.show()
