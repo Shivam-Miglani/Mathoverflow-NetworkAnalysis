@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# let's define some constants here
+# let's define some constants first
 
 # the number of nodes in ALL 3 layers
 NUMBER_OF_NODES = 24818
@@ -122,9 +122,9 @@ clust_dict2 = nx.clustering(G2)
 clust_dict3 = nx.clustering(G3)
 
 # now, we order the clustering coefficients descendingly (i.e. high clustering coeff first)
-ordered_node_clust1 = sorted(((value,key) for (key,value) in clust_dict1.items()), reverse=True)
-ordered_node_clust2 = sorted(((value,key) for (key,value) in clust_dict2.items()), reverse=True)
-ordered_node_clust3 = sorted(((value,key) for (key,value) in clust_dict3.items()), reverse=True)
+ordered_node_clust1 = sorted(clust_dict1, key=clust_dict1.get, reverse=True)
+ordered_node_clust2 = sorted(clust_dict2, key=clust_dict2.get, reverse=True)
+ordered_node_clust3 = sorted(clust_dict3, key=clust_dict3.get, reverse=True)
 
 # calculate n of top 10%
 n_top10 = int(NUMBER_OF_NODES / 10)
@@ -142,7 +142,7 @@ c23 = len(calculate_intersection(ordered_node_clust2, ordered_node_clust3))
 # calculate how many clustering coefficients are in the intersection among all graphs
 c_all = len(calculate_intersection3(ordered_node_clust1, ordered_node_clust2, ordered_node_clust3))
 
-# finally calculate the intersection rate in top 10% node in term of degree
+# finally calculate the intersection rate in top 10% node in term of Clustering Coefficient
 r_c1 = float(c12) / float(n_top10)
 r_c2 = float(c13) / float(n_top10)
 r_c3 = float(c23) / float(n_top10)
@@ -155,8 +155,8 @@ print("N(intersection_of_top10p_a2q_and_c2a)/N(top10p) : %f" % r_c2)
 print("N(intersection_of_top10p_c2q_and_c2a)/N(top10p) : %f" % r_c3)
 print("N(intersection_of_top10p_all)/N(top10p) : %f" % r_c_all)
 
-# now let's dump the degree data of all layers
-# but first, let's clean our data first by adding nodes with zero degree
+# now let's dump the Clustering Coefficient data of all layers
+# but first, let's clean our data first by adding nodes with zero Clustering Coefficient
 cl_g1 = [0] * NUMBER_OF_NODES
 cl_g2 = [0] * NUMBER_OF_NODES
 cl_g3 = [0] * NUMBER_OF_NODES
