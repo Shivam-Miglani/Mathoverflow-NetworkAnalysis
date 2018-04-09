@@ -24,7 +24,7 @@ print(nx.info(G2))
 print(nx.info(G3))
 
 # compute degree
-compute_metric(get_degree_dictionary, "Degree", G1, G2, G3, NUMBER_OF_NODES,
+compute_metric(nx.degree_centrality, "Degree", G1, G2, G3, NUMBER_OF_NODES,
     generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
 
 # compute clustering coefficient
@@ -35,10 +35,11 @@ compute_metric(nx.clustering, "Clustering Coefficient", G1, G2, G3,
 compute_metric(nx.pagerank, "Pagerank", G1, G2, G3,
     NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
 
+# compute eigenvector
+compute_metric(nx.eigenvector_centrality, "Eigenvector", G1, G2, G3,
+    NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
+
 # compute betweenness
 compute_metric(nx.betweenness_centrality, "Betweenness", G1, G2, G3,
     NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
 
-# compute eigenvector
-compute_metric(nx.eigenvector_centrality, "Eigenvector", G1, G2, G3,
-    NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)

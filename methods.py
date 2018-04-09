@@ -48,19 +48,6 @@ def generate_all_graphs():
 
     return (G1, G2, G3)
 
-def get_degree_dictionary(G):
-    # returns a dict of node and degree
-    # with the node_id as the key
-    # and degree of the associated node as the value
-
-    deg = G.degree()
-
-    deg_dict = {}
-    for n,d in deg:
-        deg_dict[int(n)] = d
-
-    return deg_dict
-
 def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=False, draw_plot=False):
     """
         This functions compute the intersection rate and correlation coefficient for a metric.
