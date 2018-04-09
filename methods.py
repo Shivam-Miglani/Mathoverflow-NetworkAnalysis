@@ -72,12 +72,12 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=F
 
         Optionally we can also make the function to generate CSV files and 
     """
-    # get (unordered) pagerank metrics for all node in dictionary format
+    # get (unordered) value of the metric for all nodes in dictionary format
     m_dict1 = func_name(G1)
     m_dict2 = func_name(G2)
     m_dict3 = func_name(G3)
 
-    # now, we order the pagerank descendingly (i.e. high pagerank first)
+    # now, we order the metric value descendingly (i.e. high value first)
     ordered_node_m1 = sorted(m_dict1, key=m_dict1.get, reverse=True)
     ordered_node_m2 = sorted(m_dict2, key=m_dict2.get, reverse=True)
     ordered_node_m3 = sorted(m_dict3, key=m_dict3.get, reverse=True)
@@ -85,7 +85,7 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=F
     # calculate n of top 10%
     n_top10 = int(n_nodes / 10)
 
-    # slice our lists to be consisted of only top 10%
+    # get top 10% subset of our ordered node id list
     ordered_node_m1 = ordered_node_m1[:n_top10]
     ordered_node_m2 = ordered_node_m2[:n_top10]
     ordered_node_m3 = ordered_node_m3[:n_top10]
@@ -95,10 +95,10 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=F
     m13 = len(calculate_intersection(ordered_node_m1, ordered_node_m3))
     m23 = len(calculate_intersection(ordered_node_m2, ordered_node_m3))
 
-    # calculate how many clustering coefficients are in the intersection among all graphs
+    # calculate how many nodes are in the intersection among all graphs
     m_all = len(calculate_intersection3(ordered_node_m1, ordered_node_m2, ordered_node_m3))
 
-    # finally calculate the intersection rate in top 10% node in term of pagerank
+    # finally calculate the intersection rate in top 10% node in term of the given metric
     rm1 = float(m12) / float(n_top10)
     rm2 = float(m13) / float(n_top10)
     rm3 = float(m23) / float(n_top10)
@@ -111,8 +111,8 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=F
     print("N(intersection_of_top10p_c2q_and_c2a)/N(top10p) : %f" % rm3)
     print("N(intersection_of_top10p_all)/N(top10p) : %f" % rm_all)
 
-    # now let's dump the pagerank data of all layers
-    # but first, let's clean our data first by adding nodes with zero pagerank
+    # now let's dump the metric values data of all layers
+    # but first, let's clean our data first by adding nodes with zero value
     ml_g1 = [0] * n_nodes
     ml_g2 = [0] * n_nodes
     ml_g3 = [0] * n_nodes
@@ -136,16 +136,15 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=F
         fname = "%s.csv" % '_'.join(result_header.lower().split())
         with open(fname, 'w') as f:
             writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
-            writer.writerow(['node_id', 'degree_a2q', 'degree_c2q', 'degree_c2a'])
+            writer.writerow(['node_id', 'val_a2q', 'val_c2q', 'val_c2a'])
             for i in range(n_nodes):
                 writer.writerow([(i+1), ml_g1[i], ml_g2[i], ml_g3[i]])
 
-    # print the correlation coefficient matrix
+    # print the correlation coefficient matrix of the given metric
     mf = pd.DataFrame({'a2q': ml_g1, 'c2q' : ml_g2, 'c2a' : ml_g3})
     print(mf.corr())
 
-    # draw the scatter matrix
+    # draw the scatter matrix of the given metric
     if draw_plot:
         pd.scatter_matrix(mf, figsize=(6, 6))
         plt.show()
-
