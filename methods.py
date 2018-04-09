@@ -28,7 +28,7 @@ def calculate_intersection3(lst1, lst2, lst3):
 
     return lst5
 
-def generate_graph_from_file(fname, graph_name=None):
+def generate_aggregated_graph_from_file(fname, graph_name=None):
     if graph_name is not None:
         G = nx.Graph(name=graph_name)
     else:
@@ -41,10 +41,49 @@ def generate_graph_from_file(fname, graph_name=None):
 
     return G
 
-def generate_all_graphs():
-    G1 = generate_graph_from_file("data/sx-mathoverflow-a2q.txt", "a2q graph")
-    G2 = generate_graph_from_file("data/sx-mathoverflow-c2q.txt", "c2q graph")
-    G3 = generate_graph_from_file("data/sx-mathoverflow-c2a.txt", "c2a graph")
+def caculate_node_appearances_from_file(fname, n_nodes):
+    nodes_in_timeslot = {}
+    result = {}
+
+    # first, we build node list per timeslot dict
+    # the key is the timeslot id, value is unique list of nodes
+    with open(fname) as f:
+        for line in f:
+            i, j, t = [int(i) for i in line.strip().split()]
+
+            if nodes_in_timeslot.get(t) is None:
+                # we have not yet seen this timeslot
+                nodes_in_timeslot[t] = []
+                nodes_in_timeslot[t].append(i)
+                nodes_in_timeslot[t].append(j)
+            else:
+                # the timeslot is already there before
+                if i not in nodes_in_timeslot[t]:
+                    nodes_in_timeslot[t].append(i)
+                if j not in nodes_in_timeslot[t]:
+                    nodes_in_timeslot[t].append(j)
+
+    # we then build the resulting dict by counting the number of appearances
+    for time, node_list in nodes_in_timeslot.items():
+        for n in node_list:
+            if result.get(n) is None:
+                result[n] = 1
+            else:
+                result[n] += 1
+
+    return result
+
+def generate_all_node_appearances(n_nodes):
+    n_app1 = caculate_node_appearances_from_file("data/a2q-t-redacted.txt", n_nodes)
+    n_app2 = caculate_node_appearances_from_file("data/c2q-t-redacted.txt", n_nodes)
+    n_app3 = caculate_node_appearances_from_file("data/c2a-t-redacted.txt", n_nodes)
+
+    return (n_app1, n_app2, n_app3)
+
+def generate_all_aggregated_graphs():
+    G1 = generate_aggregated_graph_from_file("data/sx-mathoverflow-a2q.txt", "a2q graph")
+    G2 = generate_aggregated_graph_from_file("data/sx-mathoverflow-c2q.txt", "c2q graph")
+    G3 = generate_aggregated_graph_from_file("data/sx-mathoverflow-c2a.txt", "c2a graph")
 
     return (G1, G2, G3)
 
@@ -59,10 +98,15 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=F
 
         Optionally we can also make the function to generate CSV files and 
     """
+    
     # get (unordered) value of the metric for all nodes in dictionary format
-    m_dict1 = func_name(G1)
-    m_dict2 = func_name(G2)
-    m_dict3 = func_name(G3)
+    if func_name == generate_all_node_appearances:
+        # special case, generate the number of appearance from temporal graph
+        m_dict1, m_dict2, m_dict3 = generate_all_node_appearances(n_nodes)
+    else:
+        m_dict1 = func_name(G1)
+        m_dict2 = func_name(G2)
+        m_dict3 = func_name(G3)
 
     # now, we order the metric value descendingly (i.e. high value first)
     ordered_node_m1 = sorted(m_dict1, key=m_dict1.get, reverse=True)
@@ -73,17 +117,17 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=F
     n_top10 = int(n_nodes / 10)
 
     # get top 10% subset of our ordered node id list
-    ordered_node_m1 = ordered_node_m1[:n_top10]
-    ordered_node_m2 = ordered_node_m2[:n_top10]
-    ordered_node_m3 = ordered_node_m3[:n_top10]
+    ordered_node_top10_m1 = ordered_node_m1[:n_top10]
+    ordered_node_top10_m2 = ordered_node_m2[:n_top10]
+    ordered_node_top10_m3 = ordered_node_m3[:n_top10]
 
     # calculate how many nodes are in the intersection between all pairs of graph
-    m12 = len(calculate_intersection(ordered_node_m1, ordered_node_m2))
-    m13 = len(calculate_intersection(ordered_node_m1, ordered_node_m3))
-    m23 = len(calculate_intersection(ordered_node_m2, ordered_node_m3))
+    m12 = len(calculate_intersection(ordered_node_top10_m1, ordered_node_top10_m2))
+    m13 = len(calculate_intersection(ordered_node_top10_m1, ordered_node_top10_m3))
+    m23 = len(calculate_intersection(ordered_node_top10_m2, ordered_node_top10_m3))
 
     # calculate how many nodes are in the intersection among all graphs
-    m_all = len(calculate_intersection3(ordered_node_m1, ordered_node_m2, ordered_node_m3))
+    m_all = len(calculate_intersection3(ordered_node_top10_m1, ordered_node_top10_m2, ordered_node_top10_m3))
 
     # finally calculate the intersection rate in top 10% node in term of the given metric
     rm1 = float(m12) / float(n_top10)
@@ -100,23 +144,23 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=F
 
     # now let's dump the metric values data of all layers
     # but first, let's clean our data first by adding nodes with zero value
-    ml_g1 = [0] * n_nodes
-    ml_g2 = [0] * n_nodes
-    ml_g3 = [0] * n_nodes
+    # note: the node id is a random number and the range is more than n_nodes
 
-    for i in range(n_nodes):
-        val1 = m_dict1.get(i+1)
-        val2 = m_dict2.get(i+1)
-        val3 = m_dict3.get(i+1)
+    # initialize the aggregated node list
+    agg_node_list = list(set(list(G1.nodes()) + list(G2.nodes()) + list(G3.nodes())))
+    m_val_dict = {}
 
-        if val1 is not None:
-            ml_g1[i] = m_dict1.get(i+1)
+    for node in agg_node_list:
+        m_val_dict[node] = [0, 0, 0]
 
-        if val2 is not None:
-            ml_g2[i] = m_dict2.get(i+1)
+    for key, val in m_dict1.items():
+        m_val_dict[key][0] = val
 
-        if val3 is not None:
-            ml_g3[i] = m_dict3.get(i+1)
+    for key, val in m_dict2.items():
+        m_val_dict[key][1] = val
+
+    for key, val in m_dict3.items():
+        m_val_dict[key][2] = val
 
     # write them to a CSV file
     if generate_csv:
@@ -124,10 +168,14 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=F
         with open(fname, 'w') as f:
             writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
             writer.writerow(['node_id', 'val_a2q', 'val_c2q', 'val_c2a'])
-            for i in range(n_nodes):
-                writer.writerow([(i+1), ml_g1[i], ml_g2[i], ml_g3[i]])
+            for key in sorted(m_val_dict):
+                writer.writerow([key, m_val_dict[key][0], m_val_dict[key][1], m_val_dict[key][2]])
 
     # print the correlation coefficient matrix of the given metric
+    ml_g1 = [m_val_dict[key][0] for key in sorted(m_val_dict)]
+    ml_g2 = [m_val_dict[key][1] for key in sorted(m_val_dict)]
+    ml_g3 = [m_val_dict[key][2] for key in sorted(m_val_dict)]
+
     mf = pd.DataFrame({'a2q': ml_g1, 'c2q' : ml_g2, 'c2a' : ml_g3})
     print(mf.corr())
 

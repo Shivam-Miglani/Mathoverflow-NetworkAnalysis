@@ -16,16 +16,20 @@ from methods import *
 ##### START HERE #####
 
 # let's build the graph from our dataset, they are on data/ directory
-G1, G2, G3 = generate_all_graphs()
+G1, G2, G3 = generate_all_aggregated_graphs()
 
 # print some information about the graph
 print(nx.info(G1))
 print(nx.info(G2))
 print(nx.info(G3))
 
+# compute number of appearances
+compute_metric(generate_all_node_appearances, "N_Appearances", G1, G2, G3,
+    NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
+
 # compute degree
-compute_metric(nx.degree_centrality, "Degree", G1, G2, G3, NUMBER_OF_NODES,
-    generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
+compute_metric(nx.degree_centrality, "Degree", G1, G2, G3,
+    NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
 
 # compute clustering coefficient
 compute_metric(nx.clustering, "Clustering Coefficient", G1, G2, G3,
@@ -39,7 +43,8 @@ compute_metric(nx.pagerank, "Pagerank", G1, G2, G3,
 compute_metric(nx.eigenvector_centrality, "Eigenvector", G1, G2, G3,
     NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
 
-# compute betweenness
-compute_metric(nx.betweenness_centrality, "Betweenness", G1, G2, G3,
-    NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
+# # compute betweenness
+# # note: it takes a very long time to run
+# compute_metric(nx.betweenness_centrality, "Betweenness", G1, G2, G3,
+#     NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
 
