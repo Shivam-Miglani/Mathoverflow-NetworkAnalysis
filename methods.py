@@ -62,6 +62,16 @@ def get_degree_dictionary(G):
     return deg_dict
 
 def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=False, draw_plot=False):
+    """
+        This functions compute the intersection rate and correlation coefficient for a metric.
+
+        Put the metric-calculating-function name to the func_name parameter,
+        an identifying human readable string in result_header,
+        G1, G2, G3 as three graphs we want to compare based on the metric,
+        n_nodes as the maximum number of nodes in the aggregate version,
+
+        Optionally we can also make the function to generate CSV files and 
+    """
     # get (unordered) pagerank metrics for all node in dictionary format
     m_dict1 = func_name(G1)
     m_dict2 = func_name(G2)
@@ -123,7 +133,7 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=F
 
     # write them to a CSV file
     if generate_csv:
-        fname = "pagerank.csv"
+        fname = "%s.csv" % '_'.join(result_header.lower().split())
         with open(fname, 'w') as f:
             writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
             writer.writerow(['node_id', 'degree_a2q', 'degree_c2q', 'degree_c2a'])
