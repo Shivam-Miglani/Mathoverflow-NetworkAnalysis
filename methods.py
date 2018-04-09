@@ -28,20 +28,30 @@ def calculate_intersection3(lst1, lst2, lst3):
 
     return lst5
 
-def generate_aggregated_graph_from_file(fname, graph_name=None):
-    if graph_name is not None:
-        G = nx.Graph(name=graph_name)
+def generate_aggregated_graph_from_file(fname, directed, allow_selfloop, graph_name=None):
+    if directed:
+        GraphBuilder = nx.DiGraph
     else:
-        G = nx.Graph()
+        GraphBuilder = nx.Graph
+
+    if graph_name is not None:
+        G = GraphBuilder(name=graph_name)
+    else:
+        G = GraphBuilder()
 
     with open(fname) as f:
         for line in f:
             i, j, t = [int(i) for i in line.strip().split()]
-            G.add_edge(i, j)
+
+            if allow_selfloop:
+                G.add_edge(i, j)
+            else:
+                if i != j:
+                    G.add_edge(i, j)
 
     return G
 
-def caculate_node_appearances_from_file(fname, n_nodes):
+def caculate_node_appearances_from_file(fname, n_nodes, allow_selfloop):
     nodes_in_timeslot = {}
     result = {}
 
@@ -51,17 +61,31 @@ def caculate_node_appearances_from_file(fname, n_nodes):
         for line in f:
             i, j, t = [int(i) for i in line.strip().split()]
 
-            if nodes_in_timeslot.get(t) is None:
-                # we have not yet seen this timeslot
-                nodes_in_timeslot[t] = []
-                nodes_in_timeslot[t].append(i)
-                nodes_in_timeslot[t].append(j)
-            else:
-                # the timeslot is already there before
-                if i not in nodes_in_timeslot[t]:
+            if allow_selfloop:
+                if nodes_in_timeslot.get(t) is None:
+                    # we have not yet seen this timeslot
+                    nodes_in_timeslot[t] = []
                     nodes_in_timeslot[t].append(i)
-                if j not in nodes_in_timeslot[t]:
                     nodes_in_timeslot[t].append(j)
+                else:
+                    # the timeslot is already there before
+                    if i not in nodes_in_timeslot[t]:
+                        nodes_in_timeslot[t].append(i)
+                    if j not in nodes_in_timeslot[t]:
+                        nodes_in_timeslot[t].append(j)
+            else:
+                if i != j:
+                    if nodes_in_timeslot.get(t) is None:
+                        # we have not yet seen this timeslot
+                        nodes_in_timeslot[t] = []
+                        nodes_in_timeslot[t].append(i)
+                        nodes_in_timeslot[t].append(j)
+                    else:
+                        # the timeslot is already there before
+                        if i not in nodes_in_timeslot[t]:
+                            nodes_in_timeslot[t].append(i)
+                        if j not in nodes_in_timeslot[t]:
+                            nodes_in_timeslot[t].append(j)
 
     # we then build the resulting dict by counting the number of appearances
     for time, node_list in nodes_in_timeslot.items():
@@ -73,21 +97,21 @@ def caculate_node_appearances_from_file(fname, n_nodes):
 
     return result
 
-def generate_all_node_appearances(n_nodes):
-    n_app1 = caculate_node_appearances_from_file("data/a2q-t-redacted.txt", n_nodes)
-    n_app2 = caculate_node_appearances_from_file("data/c2q-t-redacted.txt", n_nodes)
-    n_app3 = caculate_node_appearances_from_file("data/c2a-t-redacted.txt", n_nodes)
+def generate_all_node_appearances(n_nodes, allow_selfloop):
+    n_app1 = caculate_node_appearances_from_file("data/a2q-t-redacted.txt", n_nodes, allow_selfloop)
+    n_app2 = caculate_node_appearances_from_file("data/c2q-t-redacted.txt", n_nodes, allow_selfloop)
+    n_app3 = caculate_node_appearances_from_file("data/c2a-t-redacted.txt", n_nodes, allow_selfloop)
 
     return (n_app1, n_app2, n_app3)
 
-def generate_all_aggregated_graphs():
-    G1 = generate_aggregated_graph_from_file("data/sx-mathoverflow-a2q.txt", "a2q graph")
-    G2 = generate_aggregated_graph_from_file("data/sx-mathoverflow-c2q.txt", "c2q graph")
-    G3 = generate_aggregated_graph_from_file("data/sx-mathoverflow-c2a.txt", "c2a graph")
+def generate_all_aggregated_graphs(directed, allow_selfloop):
+    G1 = generate_aggregated_graph_from_file("data/sx-mathoverflow-a2q.txt", directed, allow_selfloop, "a2q graph")
+    G2 = generate_aggregated_graph_from_file("data/sx-mathoverflow-c2q.txt", directed, allow_selfloop, "c2q graph")
+    G3 = generate_aggregated_graph_from_file("data/sx-mathoverflow-c2a.txt", directed, allow_selfloop, "c2a graph")
 
     return (G1, G2, G3)
 
-def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=False, draw_plot=False):
+def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, directed, allow_selfloop, generate_csv=False, draw_plot=False):
     """
         This functions compute the intersection rate and correlation coefficient for a metric.
 
@@ -102,7 +126,7 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, generate_csv=F
     # get (unordered) value of the metric for all nodes in dictionary format
     if func_name == generate_all_node_appearances:
         # special case, generate the number of appearance from temporal graph
-        m_dict1, m_dict2, m_dict3 = generate_all_node_appearances(n_nodes)
+        m_dict1, m_dict2, m_dict3 = generate_all_node_appearances(n_nodes, allow_selfloop)
     else:
         m_dict1 = func_name(G1)
         m_dict2 = func_name(G2)
