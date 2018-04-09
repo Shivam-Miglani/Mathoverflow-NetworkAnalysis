@@ -8,6 +8,11 @@ NUMBER_OF_NODES = 24818
 GENERATE_CSV_FLAG = False
 # do we want do draw some plots?
 DRAW_PLOT_FLAG = False
+# should we build directed graph?
+# note that this may break some metric calculations
+DIRECTED_GRAPH_FLAG = False
+# should we allow self loops in the graph?
+ALLOW_SELFLOOP_FLAG = False
 
 import networkx as nx
 
@@ -16,7 +21,8 @@ from methods import *
 ##### START HERE #####
 
 # let's build the graph from our dataset, they are on data/ directory
-G1, G2, G3 = generate_all_aggregated_graphs()
+G1, G2, G3 = generate_all_aggregated_graphs(directed=DIRECTED_GRAPH_FLAG,
+                                            allow_selfloop=ALLOW_SELFLOOP_FLAG)
 
 # print some information about the graph
 print(nx.info(G1))
@@ -25,26 +31,32 @@ print(nx.info(G3))
 
 # compute number of appearances
 compute_metric(generate_all_node_appearances, "N_Appearances", G1, G2, G3,
-    NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
+    NUMBER_OF_NODES, directed=DIRECTED_GRAPH_FLAG, allow_selfloop=ALLOW_SELFLOOP_FLAG,
+    generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
 
 # compute degree
 compute_metric(nx.degree_centrality, "Degree", G1, G2, G3,
-    NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
+    NUMBER_OF_NODES, directed=DIRECTED_GRAPH_FLAG, allow_selfloop=ALLOW_SELFLOOP_FLAG,
+    generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
 
 # compute clustering coefficient
 compute_metric(nx.clustering, "Clustering Coefficient", G1, G2, G3,
-    NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
+    NUMBER_OF_NODES, directed=DIRECTED_GRAPH_FLAG, allow_selfloop=ALLOW_SELFLOOP_FLAG,
+    generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
 
 # compute pagerank
 compute_metric(nx.pagerank, "Pagerank", G1, G2, G3,
-    NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
+    NUMBER_OF_NODES, directed=DIRECTED_GRAPH_FLAG, allow_selfloop=ALLOW_SELFLOOP_FLAG,
+    generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
 
 # compute eigenvector
 compute_metric(nx.eigenvector_centrality, "Eigenvector", G1, G2, G3,
-    NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
+    NUMBER_OF_NODES, directed=DIRECTED_GRAPH_FLAG, allow_selfloop=ALLOW_SELFLOOP_FLAG,
+    generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
 
 # # compute betweenness
 # # note: it takes a very long time to run
 # compute_metric(nx.betweenness_centrality, "Betweenness", G1, G2, G3,
-#     NUMBER_OF_NODES, generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
+#     NUMBER_OF_NODES, directed=DIRECTED_GRAPH_FLAG, allow_selfloop=ALLOW_SELFLOOP_FLAG,
+#     generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
 
