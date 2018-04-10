@@ -3,6 +3,7 @@
 import csv
 from itertools import islice
 import random
+import os
 
 import networkx as nx
 import pandas as pd
@@ -10,6 +11,12 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 matplotlib.style.use('ggplot')
+
+def ensure_dir(file_path):
+    # taken from https://stackoverflow.com/questions/273192/how-can-i-create-a-directory-if-it-does-not-exist
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 def calculate_intersection(lst1, lst2):
     # taken from
@@ -205,6 +212,7 @@ def compute_metric(func_name, result_header, G1, G2, G3, sample_ratio, timeperio
     # write them to a CSV file
     if generate_csv:
         stem = '_'.join(result_header.lower().split())
+        ensure_dir("metric/")
         fname = "metric/%s-tp%d.csv" % (stem, timeperiod)
         with open(fname, 'w') as f:
             writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
