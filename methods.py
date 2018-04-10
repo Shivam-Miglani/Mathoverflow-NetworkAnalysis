@@ -28,6 +28,21 @@ def calculate_intersection3(lst1, lst2, lst3):
 
     return lst5
 
+def split_generations(fname):
+    stem = fname.split('.')[0]
+    with open(fname) as f,  open('%s-g1.txt'%stem, 'w') as g1, \
+            open('%s-g2.txt'%stem, 'w') as g2, open('%s-g3.txt'%stem, 'w') as g3:
+
+        for line in f:
+            i, j, t = [int(i) for i in line.strip().split()]
+
+            if t <= 1321883068:
+                g1.write(line)
+            elif t <= 1389573148:
+                g2.write(line)
+            else:
+                g3.write(line)
+
 def generate_aggregated_graph_from_file(fname, directed, allow_selfloop, graph_name=None):
     if directed:
         GraphBuilder = nx.DiGraph
@@ -119,6 +134,7 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, directed, allo
         an identifying human readable string in result_header,
         G1, G2, G3 as three graphs we want to compare based on the metric,
         n_nodes as the maximum number of nodes in the aggregate version,
+        directed, allow_selfloop flags to build directed graph and allowing selfloops.
 
         Optionally we can also make the function to generate CSV files and 
     """
