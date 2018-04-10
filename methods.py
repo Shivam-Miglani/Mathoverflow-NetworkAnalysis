@@ -2,6 +2,7 @@
 
 import csv
 from itertools import islice
+import random
 
 import networkx as nx
 import pandas as pd
@@ -28,22 +29,22 @@ def calculate_intersection3(lst1, lst2, lst3):
 
     return lst5
 
-def split_generations(fname):
+def split_timeperiods(fname):
     stem = fname.split('.')[0]
-    with open(fname) as f,  open('%s-g1.txt'%stem, 'w') as g1, \
-            open('%s-g2.txt'%stem, 'w') as g2, open('%s-g3.txt'%stem, 'w') as g3:
+    with open(fname) as f,  open('%s-tp1.txt'%stem, 'w') as tp1, \
+            open('%s-tp2.txt'%stem, 'w') as tp2, open('%s-tp3.txt'%stem, 'w') as tp3:
 
         for line in f:
             i, j, t = [int(i) for i in line.strip().split()]
 
             if t <= 1321883068:
-                g1.write(line)
+                tp1.write(line)
             elif t <= 1389573148:
-                g2.write(line)
+                tp2.write(line)
             else:
-                g3.write(line)
+                tp3.write(line)
 
-def generate_aggregated_graph_from_file(fname, directed, allow_selfloop, graph_name=None):
+def generate_aggregated_graph_from_file(fname, sample_ratio, directed, allow_selfloop, graph_name=None):
     if directed:
         GraphBuilder = nx.DiGraph
     else:
@@ -54,79 +55,110 @@ def generate_aggregated_graph_from_file(fname, directed, allow_selfloop, graph_n
     else:
         G = GraphBuilder()
 
+    full_lines = []
     with open(fname) as f:
         for line in f:
-            i, j, t = [int(i) for i in line.strip().split()]
+            full_lines.append(line)
 
-            if allow_selfloop:
+    # sample the data
+    if sample_ratio > 0:
+        random.seed(1234)
+        full_lines = random.sample(full_lines, int(sample_ratio*len(full_lines)))
+
+    for line in full_lines:
+        i, j, t = [int(i) for i in line.strip().split()]
+
+        if allow_selfloop:
+            G.add_edge(i, j)
+        else:
+            if i != j:
                 G.add_edge(i, j)
-            else:
-                if i != j:
-                    G.add_edge(i, j)
 
     return G
 
-def caculate_node_appearances_from_file(fname, n_nodes, allow_selfloop):
-    nodes_in_timeslot = {}
+def caculate_node_appearances_from_file(fname, sample_ratio, agg_node_list, delta_t, allow_selfloop):
+    time_to_nodes_dict = {}
     result = {}
+
+    for node in agg_node_list:
+        result[node] = 0
 
     # first, we build node list per timeslot dict
     # the key is the timeslot id, value is unique list of nodes
+    full_lines = []
     with open(fname) as f:
         for line in f:
-            i, j, t = [int(i) for i in line.strip().split()]
+            full_lines.append(line)
 
-            if allow_selfloop:
-                if nodes_in_timeslot.get(t) is None:
+    # sample the data
+    if sample_ratio > 0:
+        random.seed(1234)
+        full_lines = random.sample(full_lines, int(sample_ratio*len(full_lines)))
+
+    for line in full_lines:
+        i, j, t = [int(x) for x in line.strip().split()]
+        t = int(t/delta_t)
+
+        if allow_selfloop:
+            if time_to_nodes_dict.get(t) is None:
+                # we have not yet seen this timeslot
+                time_to_nodes_dict[t] = []
+                time_to_nodes_dict[t].append(i)
+                time_to_nodes_dict[t].append(j)
+            else:
+                # the timeslot is already there before
+                if i not in time_to_nodes_dict[t]:
+                    time_to_nodes_dict[t].append(i)
+                if j not in time_to_nodes_dict[t]:
+                    time_to_nodes_dict[t].append(j)
+        else:
+            if i != j:
+                if time_to_nodes_dict.get(t) is None:
                     # we have not yet seen this timeslot
-                    nodes_in_timeslot[t] = []
-                    nodes_in_timeslot[t].append(i)
-                    nodes_in_timeslot[t].append(j)
+                    time_to_nodes_dict[t] = []
+                    time_to_nodes_dict[t].append(i)
+                    time_to_nodes_dict[t].append(j)
                 else:
                     # the timeslot is already there before
-                    if i not in nodes_in_timeslot[t]:
-                        nodes_in_timeslot[t].append(i)
-                    if j not in nodes_in_timeslot[t]:
-                        nodes_in_timeslot[t].append(j)
-            else:
-                if i != j:
-                    if nodes_in_timeslot.get(t) is None:
-                        # we have not yet seen this timeslot
-                        nodes_in_timeslot[t] = []
-                        nodes_in_timeslot[t].append(i)
-                        nodes_in_timeslot[t].append(j)
-                    else:
-                        # the timeslot is already there before
-                        if i not in nodes_in_timeslot[t]:
-                            nodes_in_timeslot[t].append(i)
-                        if j not in nodes_in_timeslot[t]:
-                            nodes_in_timeslot[t].append(j)
+                    if i not in time_to_nodes_dict[t]:
+                        time_to_nodes_dict[t].append(i)
+                    if j not in time_to_nodes_dict[t]:
+                        time_to_nodes_dict[t].append(j)
 
     # we then build the resulting dict by counting the number of appearances
-    for time, node_list in nodes_in_timeslot.items():
-        for n in node_list:
-            if result.get(n) is None:
-                result[n] = 1
-            else:
-                result[n] += 1
+    for time, nodes in time_to_nodes_dict.items():
+        for node in nodes:
+            result[node] += 1
 
     return result
 
-def generate_all_node_appearances(n_nodes, allow_selfloop):
-    n_app1 = caculate_node_appearances_from_file("data/a2q-t-redacted.txt", n_nodes, allow_selfloop)
-    n_app2 = caculate_node_appearances_from_file("data/c2q-t-redacted.txt", n_nodes, allow_selfloop)
-    n_app3 = caculate_node_appearances_from_file("data/c2a-t-redacted.txt", n_nodes, allow_selfloop)
+def generate_all_node_appearances(agg_node_list, sample_ratio, timeperiod, delta_t, allow_selfloop):
+    if (timeperiod < 1) or (timeperiod > 3):
+        raise ValueError('timeperiod value is outside range')
+
+    n_app1 = caculate_node_appearances_from_file("data/tp%d/sx-mathoverflow-a2q-tp%d.txt"%(timeperiod, timeperiod),
+                                                            sample_ratio, agg_node_list, delta_t, allow_selfloop)
+    n_app2 = caculate_node_appearances_from_file("data/tp%d/sx-mathoverflow-c2q-tp%d.txt"%(timeperiod, timeperiod),
+                                                            sample_ratio, agg_node_list, delta_t, allow_selfloop)
+    n_app3 = caculate_node_appearances_from_file("data/tp%d/sx-mathoverflow-c2a-tp%d.txt"%(timeperiod, timeperiod),
+                                                            sample_ratio, agg_node_list, delta_t, allow_selfloop)
 
     return (n_app1, n_app2, n_app3)
 
-def generate_all_aggregated_graphs(directed, allow_selfloop):
-    G1 = generate_aggregated_graph_from_file("data/sx-mathoverflow-a2q.txt", directed, allow_selfloop, "a2q graph")
-    G2 = generate_aggregated_graph_from_file("data/sx-mathoverflow-c2q.txt", directed, allow_selfloop, "c2q graph")
-    G3 = generate_aggregated_graph_from_file("data/sx-mathoverflow-c2a.txt", directed, allow_selfloop, "c2a graph")
+def generate_all_aggregated_graphs(timeperiod, sample_ratio, directed, allow_selfloop):
+    if (timeperiod < 1) or (timeperiod > 3):
+        raise ValueError('timeperiod value is outside range')
+
+    G1 = generate_aggregated_graph_from_file("data/tp%d/sx-mathoverflow-a2q-tp%d.txt"%(timeperiod, timeperiod),
+                                                            sample_ratio, directed, allow_selfloop, "a2q graph")
+    G2 = generate_aggregated_graph_from_file("data/tp%d/sx-mathoverflow-c2q-tp%d.txt"%(timeperiod, timeperiod),
+                                                            sample_ratio, directed, allow_selfloop, "c2q graph")
+    G3 = generate_aggregated_graph_from_file("data/tp%d/sx-mathoverflow-c2a-tp%d.txt"%(timeperiod, timeperiod),
+                                                            sample_ratio, directed, allow_selfloop, "c2a graph")
 
     return (G1, G2, G3)
 
-def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, directed, allow_selfloop, generate_csv=False, draw_plot=False):
+def compute_metric(func_name, result_header, G1, G2, G3, sample_ratio, timeperiod, n_nodes, directed, allow_selfloop, generate_csv=False, draw_plot=False):
     """
         This functions compute the intersection rate and correlation coefficient for a metric.
 
@@ -138,60 +170,28 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, directed, allo
 
         Optionally we can also make the function to generate CSV files and 
     """
+
+    # initialize the aggregated node list
+    agg_node_list = list(set(list(G1) + list(G2) + list(G3)))
     
     # get (unordered) value of the metric for all nodes in dictionary format
     if func_name == generate_all_node_appearances:
         # special case, generate the number of appearance from temporal graph
-        m_dict1, m_dict2, m_dict3 = generate_all_node_appearances(n_nodes, allow_selfloop)
+        m_dict1, m_dict2, m_dict3 = generate_all_node_appearances(agg_node_list, sample_ratio,
+                                                timeperiod, 10000, allow_selfloop)
     else:
         m_dict1 = func_name(G1)
         m_dict2 = func_name(G2)
         m_dict3 = func_name(G3)
 
-    # now, we order the metric value descendingly (i.e. high value first)
-    ordered_node_m1 = sorted(m_dict1, key=m_dict1.get, reverse=True)
-    ordered_node_m2 = sorted(m_dict2, key=m_dict2.get, reverse=True)
-    ordered_node_m3 = sorted(m_dict3, key=m_dict3.get, reverse=True)
-
-    # calculate n of top 10%
-    n_top10 = int(n_nodes / 10)
-
-    # get top 10% subset of our ordered node id list
-    ordered_node_top10_m1 = ordered_node_m1[:n_top10]
-    ordered_node_top10_m2 = ordered_node_m2[:n_top10]
-    ordered_node_top10_m3 = ordered_node_m3[:n_top10]
-
-    # calculate how many nodes are in the intersection between all pairs of graph
-    m12 = len(calculate_intersection(ordered_node_top10_m1, ordered_node_top10_m2))
-    m13 = len(calculate_intersection(ordered_node_top10_m1, ordered_node_top10_m3))
-    m23 = len(calculate_intersection(ordered_node_top10_m2, ordered_node_top10_m3))
-
-    # calculate how many nodes are in the intersection among all graphs
-    m_all = len(calculate_intersection3(ordered_node_top10_m1, ordered_node_top10_m2, ordered_node_top10_m3))
-
-    # finally calculate the intersection rate in top 10% node in term of the given metric
-    rm1 = float(m12) / float(n_top10)
-    rm2 = float(m13) / float(n_top10)
-    rm3 = float(m23) / float(n_top10)
-    rm_all = float(m_all) / float(n_top10)
-
-    # let's print the result
-    print("\n##%s Results\n" % result_header)
-    print("N(intersection_of_top10p_a2q_and_c2q)/N(top10p) : %f" % rm1)
-    print("N(intersection_of_top10p_a2q_and_c2a)/N(top10p) : %f" % rm2)
-    print("N(intersection_of_top10p_c2q_and_c2a)/N(top10p) : %f" % rm3)
-    print("N(intersection_of_top10p_all)/N(top10p) : %f" % rm_all)
-
-    # now let's dump the metric values data of all layers
+    # now let's dump the metric values to csv files
     # but first, let's clean our data first by adding nodes with zero value
     # note: the node id is a random number and the range is more than n_nodes
 
-    # initialize the aggregated node list
-    agg_node_list = list(set(list(G1.nodes()) + list(G2.nodes()) + list(G3.nodes())))
     m_val_dict = {}
 
     for node in agg_node_list:
-        m_val_dict[node] = [0, 0, 0]
+        m_val_dict[node] = [0.0, 0.0, 0.0]
 
     for key, val in m_dict1.items():
         m_val_dict[key][0] = val
@@ -204,12 +204,16 @@ def compute_metric(func_name, result_header, G1, G2, G3, n_nodes, directed, allo
 
     # write them to a CSV file
     if generate_csv:
-        fname = "%s.csv" % '_'.join(result_header.lower().split())
+        stem = '_'.join(result_header.lower().split())
+        fname = "metric/%s-tp%d.csv" % (stem, timeperiod)
         with open(fname, 'w') as f:
             writer = csv.writer(f, delimiter=',', quoting=csv.QUOTE_NONE)
-            writer.writerow(['node_id', 'val_a2q', 'val_c2q', 'val_c2a'])
+            writer.writerow(['node_id', '%s_tp%d_a2q'%(stem,timeperiod), '%s_tp%d_c2q'%(stem,timeperiod), '%s_tp%d_c2a'%(stem,timeperiod)])
             for key in sorted(m_val_dict):
                 writer.writerow([key, m_val_dict[key][0], m_val_dict[key][1], m_val_dict[key][2]])
+
+    # let's print the result
+    print("\n##%s Results\n" % result_header)
 
     # print the correlation coefficient matrix of the given metric
     ml_g1 = [m_val_dict[key][0] for key in sorted(m_val_dict)]
