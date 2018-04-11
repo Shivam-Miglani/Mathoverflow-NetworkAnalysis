@@ -14,7 +14,7 @@ DIRECTED_GRAPH_FLAG = True
 # should we allow self loops in the graph?
 ALLOW_SELFLOOP_FLAG = False
 # which time period of data do we want to process? possible values are 1,2,3
-TIMEPERIOD = 3
+TIMEPERIOD = 1
 # sampe ratio?
 SAMPLE_RATIO = 0.2
 
@@ -62,6 +62,12 @@ compute_metric(nx.eigenvector_centrality, "Eigenvector", G1, G2, G3, sample_rati
 compute_metric(nx.core_number, "Coreness", G1, G2, G3, sample_ratio=SAMPLE_RATIO, timeperiod=TIMEPERIOD,
     n_nodes=NUMBER_OF_NODES, directed=DIRECTED_GRAPH_FLAG, allow_selfloop=ALLOW_SELFLOOP_FLAG,
     generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
+
+# compute closeness
+compute_metric(nx.closeness_centrality, "Closeness", G1, G2, G3, sample_ratio=SAMPLE_RATIO, timeperiod=TIMEPERIOD,
+    n_nodes=NUMBER_OF_NODES, directed=DIRECTED_GRAPH_FLAG, allow_selfloop=ALLOW_SELFLOOP_FLAG,
+    generate_csv=GENERATE_CSV_FLAG, draw_plot=DRAW_PLOT_FLAG)
+
 
 # # compute degree
 # compute_metric(nx.degree_centrality, "Degree", G1, G2, G3, sample_ratio=SAMPLE_RATIO, timeperiod=TIMEPERIOD,
