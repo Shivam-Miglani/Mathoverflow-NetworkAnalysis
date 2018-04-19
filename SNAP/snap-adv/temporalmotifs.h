@@ -2,6 +2,7 @@
 #define snap_temporalmotifs_h
 
 #include "Snap.h"
+#include <map>
 
 typedef TKeyDat<TInt, TInt> TIntPair;
 
@@ -18,7 +19,7 @@ class Counter1D {
   const TUInt64& operator()(int i) const { return data_[i]; }
   TUInt64& operator()(int i) { return data_[i]; }
   int m() { return m_; }
-  
+
  private:
   int m_;
   TUInt64V data_;
@@ -36,7 +37,7 @@ class Counter2D {
   TUInt64& operator()(int i, int j) { return data_[i + j * m_]; }
   int m() { return m_; }
   int n() { return n_; }
-  
+
  private:
   int m_;
   int n_;
@@ -59,8 +60,8 @@ class Counter3D {
   }
   int m() { return m_; }
   int n() { return n_; }
-  int p() { return p_; }  
-  
+  int p() { return p_; }
+
  private:
   int m_;
   int n_;
@@ -90,7 +91,7 @@ class StarEdgeData {
 };
 
 // Main temporal motif counting class.  This implementation has support for
-// counting motifs with three temporal edges on two or three nodes.  
+// counting motifs with three temporal edges on two or three nodes.
 class TempMotifCounter {
  public:
   // Reads directed temporal graph data from the specified file, which must have
@@ -105,7 +106,7 @@ class TempMotifCounter {
   //   counts(1, 0): u --> v, u --> v, u --> v  (M_{6,1})
   //   counts(1, 1): u --> v, u --> v, v --> u  (M_{6,2})
   void Count3TEdge2Node(double delta, Counter2D& counts);
-  
+
   // Similar to Count3TEdge2Node() except only counts motif instances
   // for a given pair of nodes u and v and specifies the source and destination
   // node.  The counts format is:
@@ -117,7 +118,7 @@ class TempMotifCounter {
   //   counts(1, 0, 1): v --> u, u --> v, v --> u
   //   counts(0, 0, 1): u --> v, u --> v, v --> u
   //   counts(1, 1, 0): v --> u, v --> u, u --> v
-  void Count3TEdge2Node(int u, int v, double delta, Counter3D& counts);
+  void Count3TEdge2Node(int u, int v, double delta,  Counter3D& counts);
 
   // Counts 3-edge, 3-node star motifs and places the results in pre_counts,
   // pos_counts, and mid_counts.  Counts take the following structure (with
@@ -134,7 +135,7 @@ class TempMotifCounter {
   //     pos_counts(0, 1, 0): c --> u, v --> c, c --> v
   void Count3TEdge3NodeStars(double delta, Counter3D& pre_counts,
                              Counter3D& pos_counts, Counter3D& mid_counts);
-  
+
   // Counts the same information as Count3TEdge3NodeStars() but uses a naive
   // counting algorithm that iterates over all pairs of neighbors.
   void Count3TEdge3NodeStarsNaive(double delta, Counter3D& pre_counts,
@@ -151,14 +152,14 @@ class TempMotifCounter {
   //    counts(1, 1, 0): u --> v, u --> w, v --> w (M_{4,5})
   //    counts(1, 1, 1): u --> v, u --> w, w --> v (M_{4,6})
   void Count3TEdgeTriads(double delta, Counter3D& counts);
-  
+
   // Counts the same information as Count3TEdgeTriads() but uses a naive
   // counting algorithm that enumerates over all triangles in the static graph.
   void Count3TEdgeTriadsNaive(double delta, Counter3D& counts);
 
   // Counts all 3-edge, {2,3}-node temporal motifs and places the result in
   // counts such that counts(i, j) corresponds to motif M_{i,j}.
-  void Count3TEdge23Node(double delta, Counter2D& counts);  
+  void Count3TEdge23Node(double delta, Counter2D& counts);
 
  private:
   // Get all triangles in the static graph, (Us(i), Vs(i), Ws(i)) is the ith
@@ -176,18 +177,24 @@ class TempMotifCounter {
   // A simple wrapper for adding triad edge data
   void AddTriadEdgeData(TVec<TriadEdgeData>& events, TVec<TIntPair>& ts_indices,
                         int& index, int u, int v, int nbr, int key1, int key2);
-  // A simple wrapper for adding star edge data  
+  // A simple wrapper for adding star edge data
   void AddStarEdgeData(TVec<TIntPair>& ts_indices, TVec<StarEdgeData>& events,
 		       int& index, int u, int v, int nbr, int key);
   // Another simple wrapper for adding star edge data
   void AddStarEdges(TVec<TIntPair>& combined, int u, int v, int key);
 
   // Directed graph from ignoring timestamps
-  PNGraph static_graph_;  
+  PNGraph static_graph_;
+
+  //node ids in static graph
+  TIntV node_ids;
+  std::map<int, int> centrality_motif_counts;
 
   // Core data structure for storing temporal edges.  temporal_data_[u](v) is a
   // list of temporal edges along the static edge (u, v).
   TVec< THash<TInt, TIntV> > temporal_data_;
+public:
+  void GetCentralityCount();
 };
 
 // This class exhaustively counts all size^3 three-edge temporal motifs in an
