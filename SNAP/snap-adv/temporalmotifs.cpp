@@ -283,7 +283,7 @@ void TempMotifCounter::GetCentralityCount(){
 
   //  printing the counts
   for (std::map<int,int>::iterator it=centrality_motif_counts.begin(); it!=centrality_motif_counts.end(); ++it)
-        std::cout << it->first << " => " << it->second << '\n';
+        std::cout << it->first << ", " << it->second << '\n';
 
 }
 

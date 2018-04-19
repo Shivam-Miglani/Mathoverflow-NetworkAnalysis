@@ -13,9 +13,9 @@ int main(int argc, char* argv[]) {
   Try
 
   const TStr temporal_graph_filename =
-    Env.GetIfArgPrefixStr("-i:", "data/tp1/sx-mathoverflow-a2q-tp1.txt", "Input directed temporal graph file");
+    Env.GetIfArgPrefixStr("-i:", "data/tp3/sx-mathoverflow-c2a-tp3.txt", "Input directed temporal graph file");
   const TStr output =
-    Env.GetIfArgPrefixStr("-o:", "temporal-motif-counts.txt",
+    Env.GetIfArgPrefixStr("-o:", "temporal-motif-c2a-tp3.txt",
 			  "Output file in which to write counts");
   const TFlt delta =
     Env.GetIfArgPrefixFlt("-delta:", 1321883068, "Time window delta");
