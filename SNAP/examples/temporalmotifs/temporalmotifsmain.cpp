@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
   Try
 
   const TStr temporal_graph_filename =
-    Env.GetIfArgPrefixStr("-i:", "/data/tp1/sx-mathoverflow-a2q-tp1.txt",
+    Env.GetIfArgPrefixStr("-i:", "data/tp1/sx-mathoverflow-a2q-tp1.txt",
 			  "Input directed temporal graph file");
   const TStr output = 
     Env.GetIfArgPrefixStr("-o:", "temporal-motif-counts.txt",
