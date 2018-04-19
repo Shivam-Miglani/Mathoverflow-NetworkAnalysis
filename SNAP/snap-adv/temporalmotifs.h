@@ -157,6 +157,8 @@ class TempMotifCounter {
   //    counts(1, 1, 1): u --> v, u --> w, w --> v (M_{4,6})
   void Count3TEdgeTriads(double delta, Counter3D& counts);
 
+    void Count3TEdgeTriads(double delta, Counter3D& counts,int node_id);
+
   // Counts the same information as Count3TEdgeTriads() but uses a naive
   // counting algorithm that enumerates over all triangles in the static graph.
   void Count3TEdgeTriadsNaive(double delta, Counter3D& counts);

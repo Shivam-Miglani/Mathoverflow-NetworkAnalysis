@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
     Env.GetIfArgPrefixStr("-o:", "temporal-motif-counts.txt",
 			  "Output file in which to write counts");
   const TFlt delta =
-    Env.GetIfArgPrefixFlt("-delta:", 4096, "Time window delta");
+    Env.GetIfArgPrefixFlt("-delta:", 1321883068, "Time window delta");
   const int num_threads =
     Env.GetIfArgPrefixInt("-nt:", 4, "Number of threads for parallelization");
 
