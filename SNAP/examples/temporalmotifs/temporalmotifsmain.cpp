@@ -30,6 +30,7 @@ int main(int argc, char* argv[]) {
   TempMotifCounter tmc(temporal_graph_filename);
   Counter2D counts;
   tmc.Count3TEdge23Node(delta, counts);
+  tmc.GetCentralityCount();
   FILE* output_file = fopen(output.CStr(), "wt");
   for (int i = 0; i < counts.m(); i++) {
     for (int j = 0; j < counts.n(); j++) {

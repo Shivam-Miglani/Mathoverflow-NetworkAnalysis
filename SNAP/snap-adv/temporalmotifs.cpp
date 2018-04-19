@@ -134,107 +134,254 @@ void TempMotifCounter::GetCentralityCount(){
     centrality_motif_counts[node_ids[i]] = 0;
   }
 
+
   TIntV nbrs;
-  //time period 1 - 2edges shit.
-  for (int i = 0; i < node_ids.Len(); i++) {
+//  //time period 1 - 2edges shit.
+//  for (int i = 0; i < node_ids.Len(); i++) {
+//
+//      GetAllNeighbors(i,nbrs);
+//      Counter2D counts(2,2);
+//      for(int j=0; j< nbrs.Len(); j++) {
+//          Counter3D local;
+//          Count3TEdge2Node(i, j , 1321883068, local);
+//          #pragma omp critical
+//          {
+//              counts(0, 0) += local(0, 1, 0) + local(1, 0, 1);  // M_{5,1}
+//              if(counts(0,0) > 0){
+//                  centrality_motif_counts[i] += counts(0,0);
+//              }
+//              counts(0, 1) += local(1, 0, 0) + local(0, 1, 1);  // M_{5,2}
+//              if(counts(0,1) > 0){
+//                  centrality_motif_counts[i] += 1;
+//              }
+//              counts(1, 0) += local(0, 0, 0) + local(1, 1, 1);  // M_{6,1}
+//              if(counts(1,0) > 0){
+//                  centrality_motif_counts[i] += 1;
+//              }
+//              counts(1, 1) += local(0, 0, 1) + local(1, 1, 0);  // M_{6,2}
+//              if(counts(1,1) > 0){
+//                  centrality_motif_counts[i] += 1;
+//              }
+//          }
+//      }
+//  }
 
-      GetAllNeighbors(i,nbrs);
-      Counter2D counts(2,2);
-      for(int j=0; j< nbrs.Len(); j++) {
-          Counter3D local;
-          Count3TEdge2Node(i, j , 1321883068, local);
-          #pragma omp critical
-          {
-              counts(0, 0) += local(0, 1, 0) + local(1, 0, 1);  // M_{5,1}
-              if(counts(0,0) > 0){
-                  centrality_motif_counts[i] += counts(0,0);
-              }
-              counts(0, 1) += local(1, 0, 0) + local(0, 1, 1);  // M_{5,2}
-              if(counts(0,1) > 0){
-                  centrality_motif_counts[i] += 1;
-              }
-              counts(1, 0) += local(0, 0, 0) + local(1, 1, 1);  // M_{6,1}
-              if(counts(1,0) > 0){
-                  centrality_motif_counts[i] += 1;
-              }
-              counts(1, 1) += local(0, 0, 1) + local(1, 1, 0);  // M_{6,2}
-              if(counts(1,1) > 0){
-                  centrality_motif_counts[i] += 1;
-              }
-          }
-      }
-  }
+////time period 1 - 3 edges star
+//  Counter2D counts = Counter2D(6, 6);
+//    for (int i = 0; i < node_ids.Len(); i++) {
+//
+//      Counter3D pre_counts, pos_counts, mid_counts;
+//      Count3TEdge3NodeStars(1321883068, pre_counts, pos_counts, mid_counts,i);
+//      counts(0, 0) = mid_counts(1, 1, 1);
+//      if(counts(0,0) > 0){
+//        centrality_motif_counts[i] += counts(0,0);
+//      }
+//      counts(0, 1) = mid_counts(1, 1, 0);
+//      if(counts(0,1) > 0){
+//        centrality_motif_counts[i] += counts(0,1);
+//      }
+//      counts(0, 4) = pos_counts(1, 1, 0);
+//      if(counts(0,4) > 0){
+//        centrality_motif_counts[i] += counts(0,4);
+//      }
+//      counts(0, 5) = pos_counts(1, 1, 1);
+//      if(counts(0,5) > 0){
+//        centrality_motif_counts[i] += counts(0,5);
+//      }
+//      counts(1, 0) = mid_counts(1, 0, 1);
+//      if(counts(1,0) > 0){
+//        centrality_motif_counts[i] += counts(1,0);
+//      }
+//      counts(1, 1) = mid_counts(1, 0, 0);
+//      if(counts(1,1) > 0){
+//        centrality_motif_counts[i] += counts(1,1);
+//      }
+//      counts(1, 4) = pos_counts(1, 0, 0);
+//      if(counts(1,4) > 0){
+//        centrality_motif_counts[i] += counts(1,4);
+//      }
+//      counts(1, 5) = pos_counts(1, 0, 1);
+//      if(counts(1,5) > 0){
+//        centrality_motif_counts[i] += counts(1,5);
+//      }
+//      counts(2, 0) = mid_counts(0, 1, 0);
+//      if(counts(2,0) > 0){
+//        centrality_motif_counts[i] += counts(2,0);
+//      }
+//      counts(2, 1) = mid_counts(0, 1, 1);
+//      if(counts(2,1) > 0){
+//        centrality_motif_counts[i] += counts(2,1);
+//      }
+//      counts(2, 2) = pos_counts(0, 1, 0);
+//      if(counts(2,2) > 0){
+//        centrality_motif_counts[i] += counts(2,2);
+//      }
+//      counts(2, 3) = pos_counts(0, 1, 1);
+//      if(counts(2,3) > 0){
+//        centrality_motif_counts[i] += counts(2,3);
+//      }
+//      counts(3, 0) = mid_counts(0, 0, 0);
+//      if(counts(3,0) > 0){
+//        centrality_motif_counts[i] += counts(3,0);
+//      }
+//      counts(3, 1) = mid_counts(0, 0, 1);
+//      if(counts(3,1) > 0){
+//        centrality_motif_counts[i] += counts(3,1);
+//      }
+//      counts(3, 2) = pos_counts(0, 0, 0);
+//      if(counts(3,2) > 0){
+//        centrality_motif_counts[i] += counts(3,2);
+//      }
+//      counts(3, 3) = pos_counts(0, 0, 1);
+//      if(counts(3,3) > 0){
+//        centrality_motif_counts[i] += counts(3,3);
+//      }
+//      counts(4, 2) = pre_counts(0, 1, 0);
+//      if(counts(4,2) > 0){
+//        centrality_motif_counts[i] += counts(4,2);
+//      }
+//      counts(4, 3) = pre_counts(0, 1, 1);
+//      if(counts(4,3) > 0){
+//        centrality_motif_counts[i] += counts(4,3);
+//      }
+//      counts(4, 4) = pre_counts(1, 0, 0);
+//      if(counts(4,4) > 0){
+//        centrality_motif_counts[i] += counts(4,4);
+//      }
+//      counts(4, 5) = pre_counts(1, 0, 1);
+//      if(counts(4,5) > 0){
+//        centrality_motif_counts[i] += counts(4,5);
+//      }
+//      counts(5, 2) = pre_counts(0, 0, 0);
+//      if(counts(5,2) > 0){
+//        centrality_motif_counts[i] += counts(5,2);
+//      }
+//      counts(5, 3) = pre_counts(0, 0, 1);
+//      if(counts(5,3) > 0){
+//        centrality_motif_counts[i] += counts(5,3);
+//      }
+//      counts(5, 4) = pre_counts(1, 1, 0);
+//      if(counts(5,4) > 0){
+//        centrality_motif_counts[i] += counts(5,4);
+//      }
+//      counts(5, 5) = pre_counts(1, 1, 1);
+//      if(counts(5,5) > 0){
+//        centrality_motif_counts[i] += counts(5,5);
+//      }
+//
+//    }
 
-//time period 1 - 3 edges star
-    for (int i = 0; i < node_ids.Len(); i++) {
 
-        GetAllNeighbors(i,nbrs);
-        Counter2D counts(2,2);
-        for(int j=0; j< nbrs.Len(); j++) {
-            Counter3D local;
-            Count3TEdge2Node(i, j , 1321883068, local);
-#pragma omp critical
-            {
-                counts(0, 0) += local(0, 1, 0) + local(1, 0, 1);  // M_{5,1}
-                if(counts(0,0) > 0){
-                    centrality_motif_counts[i] += counts(0,0);
-                }
-                counts(0, 1) += local(1, 0, 0) + local(0, 1, 1);  // M_{5,2}
-                if(counts(0,1) > 0){
-                    centrality_motif_counts[i] += 1;
-                }
-                counts(1, 0) += local(0, 0, 0) + local(1, 1, 1);  // M_{6,1}
-                if(counts(1,0) > 0){
-                    centrality_motif_counts[i] += 1;
-                }
-                counts(1, 1) += local(0, 0, 1) + local(1, 1, 0);  // M_{6,2}
-                if(counts(1,1) > 0){
-                    centrality_motif_counts[i] += 1;
-                }
-            }
-        }
-    }
-
-
-//time period 1 - 3 edges triad
-    for (int i = 0; i < node_ids.Len(); i++) {
-
-        GetAllNeighbors(i,nbrs);
-        Counter2D counts(2,2);
-        for(int j=0; j< nbrs.Len(); j++) {
-            Counter3D local;
-            Count3TEdge2Node(i, j , 1321883068, local);
-#pragma omp critical
-            {
-                counts(0, 0) += local(0, 1, 0) + local(1, 0, 1);  // M_{5,1}
-                if(counts(0,0) > 0){
-                    centrality_motif_counts[i] += counts(0,0);
-                }
-                counts(0, 1) += local(1, 0, 0) + local(0, 1, 1);  // M_{5,2}
-                if(counts(0,1) > 0){
-                    centrality_motif_counts[i] += 1;
-                }
-                counts(1, 0) += local(0, 0, 0) + local(1, 1, 1);  // M_{6,1}
-                if(counts(1,0) > 0){
-                    centrality_motif_counts[i] += 1;
-                }
-                counts(1, 1) += local(0, 0, 1) + local(1, 1, 0);  // M_{6,2}
-                if(counts(1,1) > 0){
-                    centrality_motif_counts[i] += 1;
-                }
-            }
-        }
-    }
+////time period 1 - 3 edges triad
+//    for (int i = 0; i < node_ids.Len(); i++) {
+//
+//        GetAllNeighbors(i,nbrs);
+//        Counter2D counts(2,2);
+//        for(int j=0; j< nbrs.Len(); j++) {
+//            Counter3D local;
+//            Count3TEdge2Node(i, j , 1321883068, local);
+//#pragma omp critical
+//            {
+//                counts(0, 0) += local(0, 1, 0) + local(1, 0, 1);  // M_{5,1}
+//                if(counts(0,0) > 0){
+//                    centrality_motif_counts[i] += counts(0,0);
+//                }
+//                counts(0, 1) += local(1, 0, 0) + local(0, 1, 1);  // M_{5,2}
+//                if(counts(0,1) > 0){
+//                    centrality_motif_counts[i] += 1;
+//                }
+//                counts(1, 0) += local(0, 0, 0) + local(1, 1, 1);  // M_{6,1}
+//                if(counts(1,0) > 0){
+//                    centrality_motif_counts[i] += 1;
+//                }
+//                counts(1, 1) += local(0, 0, 1) + local(1, 1, 0);  // M_{6,2}
+//                if(counts(1,1) > 0){
+//                    centrality_motif_counts[i] += 1;
+//                }
+//            }
+//        }
+//    }
 
 
 
 
 
-  //printing the counts
-//  for (std::map<int,int>::iterator it=centrality_motif_counts.begin(); it!=centrality_motif_counts.end(); ++it)
-//        std::cout << it->first << " => " << it->second << '\n';
+//  printing the counts
+  for (std::map<int,int>::iterator it=centrality_motif_counts.begin(); it!=centrality_motif_counts.end(); ++it)
+        std::cout << it->first << " => " << it->second << '\n';
 
 }
+
+void TempMotifCounter::Count3TEdge3NodeStars(double delta, Counter3D& pre_counts, Counter3D& pos_counts, Counter3D& mid_counts, int node_id) {
+//  TIntV centers;
+//  GetAllNodes(centers);
+  pre_counts = Counter3D(2, 2, 2);
+  pos_counts = Counter3D(2, 2, 2);
+  mid_counts = Counter3D(2, 2, 2);
+  // Get counts for each node as the center
+#pragma omp parallel for schedule(dynamic)
+
+    // Gather all adjacent events
+    int center = node_id;
+    TVec<TIntPair> ts_indices;
+    TVec<StarEdgeData> events;
+    TNGraph::TNodeI NI = static_graph_->GetNI(center);
+    int index = 0;
+    TIntV nbrs;
+    GetAllNeighbors(center, nbrs);
+    int nbr_index = 0;
+    for (int i = 0; i < nbrs.Len(); i++) {
+      int nbr = nbrs[i];
+      AddStarEdgeData(ts_indices, events, index, center, nbr, nbr_index, 0);
+      AddStarEdgeData(ts_indices, events, index, nbr, center, nbr_index, 1);
+      nbr_index++;
+    }
+    ts_indices.Sort();
+    TIntV timestamps;
+    TVec<StarEdgeData> ordered_events;
+    for (int j = 0; j < ts_indices.Len(); j++) {
+      timestamps.Add(ts_indices[j].Key);
+      ordered_events.Add(events[ts_indices[j].Dat]);
+    }
+
+    ThreeTEdgeStarCounter tesc(nbr_index);
+    // dirs: outgoing --> 0, incoming --> 1
+    tesc.Count(ordered_events, timestamps, delta);
+#pragma omp critical
+    { // Update counts
+      for (int dir1 = 0; dir1 < 2; ++dir1) {
+        for (int dir2 = 0; dir2 < 2; ++dir2) {
+          for (int dir3 = 0; dir3 < 2; ++dir3) {
+            pre_counts(dir1, dir2, dir3) += tesc.PreCount(dir1, dir2, dir3);
+            pos_counts(dir1, dir2, dir3) += tesc.PosCount(dir1, dir2, dir3);
+            mid_counts(dir1, dir2, dir3) += tesc.MidCount(dir1, dir2, dir3);
+          }
+        }
+      }
+    }
+
+    // Subtract off edge-wise counts
+    for (int nbr_id = 0; nbr_id < nbrs.Len(); nbr_id++) {
+      int nbr = nbrs[nbr_id];
+      Counter3D edge_counts;
+      Count3TEdge2Node(center, nbr, delta, edge_counts);
+#pragma omp critical
+      {
+        for (int dir1 = 0; dir1 < 2; ++dir1) {
+          for (int dir2 = 0; dir2 < 2; ++dir2) {
+            for (int dir3 = 0; dir3 < 2; ++dir3) {
+              pre_counts(dir1, dir2, dir3) -= edge_counts(dir1, dir2, dir3);
+              pos_counts(dir1, dir2, dir3) -= edge_counts(dir1, dir2, dir3);
+              mid_counts(dir1, dir2, dir3) -= edge_counts(dir1, dir2, dir3);
+            }
+          }
+        }
+      }
+    }
+
+}
+
+
 
 
 void TempMotifCounter::Count3TEdge23Node(double delta, Counter2D& counts) {

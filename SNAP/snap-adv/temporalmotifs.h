@@ -136,6 +136,10 @@ class TempMotifCounter {
   void Count3TEdge3NodeStars(double delta, Counter3D& pre_counts,
                              Counter3D& pos_counts, Counter3D& mid_counts);
 
+
+    void Count3TEdge3NodeStars(double delta, Counter3D& pre_counts,
+                               Counter3D& pos_counts, Counter3D& mid_counts, int node_id);
+
   // Counts the same information as Count3TEdge3NodeStars() but uses a naive
   // counting algorithm that iterates over all pairs of neighbors.
   void Count3TEdge3NodeStarsNaive(double delta, Counter3D& pre_counts,
