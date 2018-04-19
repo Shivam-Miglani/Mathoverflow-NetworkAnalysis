@@ -321,7 +321,7 @@ void TempMotifCounter::Count3TEdge3NodeStars(double delta, Counter3D& pre_counts
       AddStarEdgeData(ts_indices, events, index, center, nbr, nbr_index, 0);
       AddStarEdgeData(ts_indices, events, index, nbr, center, nbr_index, 1);
       nbr_index++;
-    }
+    } 
     ts_indices.Sort();
     TIntV timestamps;
     TVec<StarEdgeData> ordered_events;
