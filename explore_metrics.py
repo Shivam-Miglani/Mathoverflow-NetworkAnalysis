@@ -14,9 +14,9 @@ DIRECTED_GRAPH_FLAG = True
 # should we allow self loops in the graph?
 ALLOW_SELFLOOP_FLAG = False
 # which time period of data do we want to process? possible values are 1,2,3
-TIMEPERIOD = 1
-# sampe ratio?
-SAMPLE_RATIO = 0.2
+TIMEPERIOD = 3
+# sampling ratio?
+SAMPLE_RATIO = 0
 
 import networkx as nx
 
