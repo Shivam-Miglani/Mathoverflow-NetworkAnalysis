@@ -15,10 +15,6 @@ TempMotifCounter::TempMotifCounter(const TStr& filename) {
   std::map<int, int> centrality_motif_counts;
 
 
-
-
-
-
   // Formulate input File Format:
   //   source_node destination_node timestamp
   TTableContext context;
@@ -138,9 +134,9 @@ void TempMotifCounter::GetCentralityCount(){
   TIntV nbrs;
 //  //time period 1 - 2edges shit.
   for (int i = 0; i < node_ids.Len(); i++) {
-
-      GetAllNeighbors(i,nbrs);
       Counter2D counts(2,2);
+      GetAllNeighbors(i,nbrs);
+      counts(0, 0)=counts(0,1)=counts(1,0)=counts(1,1)=0;
       for(int j=0; j< nbrs.Len(); j++) {
           Counter3D local;
           Count3TEdge2Node(i, j , 1321883068, local);
@@ -170,27 +166,29 @@ void TempMotifCounter::GetCentralityCount(){
   Counter2D counts = Counter2D(6, 6);
     for (int i = 0; i < node_ids.Len(); i++) {
 
-      Counter3D pre_counts, pos_counts, mid_counts;
+        counts(0, 0)= counts(0, 1) = counts(0, 4) = counts(0, 5) = counts(1, 0)= counts(1, 1) = counts(1, 4) =counts(1, 5) =counts(2, 0) = counts(2, 1) = counts(2, 2)= counts(2, 3) = counts(3,0) = 0;
+        counts(3,1) = counts(3, 2) = counts(3, 3) = counts(4, 2) = counts(4, 3) = counts(4, 4) = counts(4, 5) = counts(5, 2) = counts(5, 3) = counts(5, 4) = counts(5, 5) = 0;
+        Counter3D pre_counts=0, pos_counts=0, mid_counts=0;
       Count3TEdge3NodeStars(1321883068, pre_counts, pos_counts, mid_counts,i);
       counts(0, 0) = mid_counts(1, 1, 1);
       if(counts(0,0) > 0){
-        centrality_motif_counts[i] += counts(0,0);
+        centrality_motif_counts[i] += 1;
       }
       counts(0, 1) = mid_counts(1, 1, 0);
       if(counts(0,1) > 0){
-        centrality_motif_counts[i] += counts(0,1);
+        centrality_motif_counts[i] += 1;
       }
       counts(0, 4) = pos_counts(1, 1, 0);
       if(counts(0,4) > 0){
-        centrality_motif_counts[i] += counts(0,4);
+        centrality_motif_counts[i] += 1;
       }
       counts(0, 5) = pos_counts(1, 1, 1);
       if(counts(0,5) > 0){
-        centrality_motif_counts[i] += counts(0,5);
+        centrality_motif_counts[i] += 1;
       }
       counts(1, 0) = mid_counts(1, 0, 1);
       if(counts(1,0) > 0){
-        centrality_motif_counts[i] += counts(1,0);
+        centrality_motif_counts[i] += 1;
       }
       counts(1, 1) = mid_counts(1, 0, 0);
       if(counts(1,1) > 0){
@@ -272,18 +270,14 @@ void TempMotifCounter::GetCentralityCount(){
     }
 
 
-//time period 1 - 3 edges triad
-
-
+      //time period 1 - 3 edges triad
       Counter3D triad_counts;
       Count3TEdgeTriadsNaive(1321883068, triad_counts);
 
 
-
-
-  //  printing the counts
-  for (std::map<int,int>::iterator it=centrality_motif_counts.begin(); it!=centrality_motif_counts.end(); ++it)
-        std::cout << it->first << ", " << it->second << '\n';
+      //  printing the counts
+      for (std::map<int,int>::iterator it=centrality_motif_counts.begin(); it!=centrality_motif_counts.end(); ++it)
+            std::cout << it->first << ", " << it->second << '\n';
 
 }
 
@@ -757,7 +751,7 @@ void TempMotifCounter::Count3TEdgeTriadsNaive(double delta, Counter3D& counts) {
     #pragma omp critical
     {
       // i --> j, k --> j, i --> k
-      counts(0, 0, 0) += local(uv, wv, uw) + local(vu, wu, vw) + local(uw, vw, uv)
+      counts(0, 0, 0) = local(uv, wv, uw) + local(vu, wu, vw) + local(uw, vw, uv)
         + local(wu, vu, wv) + local(vw, uw, vu) + local(wv, uv, wu);
       if(counts(0,0,0)>0){
           centrality_motif_counts[u]+= counts(0,0,0);
@@ -765,7 +759,7 @@ void TempMotifCounter::Count3TEdgeTriadsNaive(double delta, Counter3D& counts) {
           centrality_motif_counts[w]+= counts(0,0,0);
       }
       // i --> j, k --> j, k --> i
-      counts(0, 0, 1) += local(uv, wv, wu) + local(vu, wu, wv) + local(uw, vw, vu)
+      counts(0, 0, 1) = local(uv, wv, wu) + local(vu, wu, wv) + local(uw, vw, vu)
         + local(wu, vu, vw) + local(vw, uw, uv) + local(wv, uv, uw);
         if(counts(0,0,1)>0){
             centrality_motif_counts[u]+= counts(0,0,1);
@@ -773,7 +767,7 @@ void TempMotifCounter::Count3TEdgeTriadsNaive(double delta, Counter3D& counts) {
             centrality_motif_counts[w]+= counts(0,0,1);
         }
       // i --> j, j --> k, i --> k
-      counts(0, 1, 0) += local(uv, vw, uw) + local(vu, uw, vw) + local(uw, wv, uv)
+      counts(0, 1, 0) = local(uv, vw, uw) + local(vu, uw, vw) + local(uw, wv, uv)
         + local(wu, uv, wv) + local(vw, wu, vu) + local(wv, vu, wu);
 
         if(counts(0,1,0)>0){
@@ -782,7 +776,7 @@ void TempMotifCounter::Count3TEdgeTriadsNaive(double delta, Counter3D& counts) {
             centrality_motif_counts[w]+= counts(0,1,0);
         }
       // i --> j, j --> k, k --> i
-      counts(0, 1, 1) += local(uv, vw, wu) + local(vu, uw, wv) + local(uw, wv, vu)
+      counts(0, 1, 1) = local(uv, vw, wu) + local(vu, uw, wv) + local(uw, wv, vu)
         + local(wu, uv, vw) + local(vw, wu, uv) + local(wv, vu, uw);
 
         if(counts(0,1,1)>0){
@@ -791,7 +785,7 @@ void TempMotifCounter::Count3TEdgeTriadsNaive(double delta, Counter3D& counts) {
             centrality_motif_counts[w]+= counts(0,1,1);
         }
       // i --> j, k --> i, j --> k
-      counts(1, 0, 0) += local(uv, wu, vw) + local(vu, wv, uw) + local(uw, vu, wv)
+      counts(1, 0, 0) = local(uv, wu, vw) + local(vu, wv, uw) + local(uw, vu, wv)
         + local(wu, vw, uv) + local(vw, uv, wu) + local(wv, uw, vu);
 
         if(counts(1,0,0)>0){
@@ -800,7 +794,7 @@ void TempMotifCounter::Count3TEdgeTriadsNaive(double delta, Counter3D& counts) {
             centrality_motif_counts[w]+= counts(1,0,0);
         }
       // i --> j, k --> i, k --> j
-      counts(1, 0, 1) += local(uv, wu, wv) + local(vu, wv, wu) + local(uw, vu, vw)
+      counts(1, 0, 1) = local(uv, wu, wv) + local(vu, wv, wu) + local(uw, vu, vw)
         + local(wu, vw, vu) + local(vw, uv, uw) + local(wv, uw, uv);
 
         if(counts(1,0,1)>0){
@@ -809,7 +803,7 @@ void TempMotifCounter::Count3TEdgeTriadsNaive(double delta, Counter3D& counts) {
             centrality_motif_counts[w]+= counts(1,0,1);
         }
       // i --> j, i --> k, j --> k
-      counts(1, 1, 0) += local(uv, uw, vw) + local(vu, vw, uw) + local(uw, uv, wv)
+      counts(1, 1, 0) = local(uv, uw, vw) + local(vu, vw, uw) + local(uw, uv, wv)
         + local(wu, wv, uv) + local(vw, vu, wu) + local(wv, wu, vu);
 
         if(counts(1,1,0)>0){
@@ -818,7 +812,7 @@ void TempMotifCounter::Count3TEdgeTriadsNaive(double delta, Counter3D& counts) {
             centrality_motif_counts[w]+= counts(1,1,0);
         }
       // i --> j, i --> k, k --> j
-      counts(1, 1, 1) += local(uv, uw, wv) + local(vu, vw, wu) + local(uw, uv, vw)
+      counts(1, 1, 1) = local(uv, uw, wv) + local(vu, vw, wu) + local(uw, uv, vw)
         + local(wu, wv, vu) + local(vw, vu, uw) + local(wv, wu, uv);
         if(counts(1,1,1)>0){
             centrality_motif_counts[u]+= counts(1,1,1);
