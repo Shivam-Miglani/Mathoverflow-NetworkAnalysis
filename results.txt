@@ -1,0 +1,69 @@
+##Dataset statistics
+
+Name: a2q graph
+Type: DiGraph
+Number of nodes: 9375
+Number of edges: 22305
+Average in degree:   2.3792
+Average out degree:   2.3792
+Name: c2q graph
+Type: DiGraph
+Number of nodes: 8265
+Number of edges: 29552
+Average in degree:   3.5756
+Average out degree:   3.5756
+Name: c2a graph
+Type: DiGraph
+Number of nodes: 6517
+Number of edges: 20201
+Average in degree:   3.0997
+Average out degree:   3.0997
+
+##N_Appearances Results
+
+          a2q       c2a       c2q
+a2q  1.000000  0.916292  0.818517
+c2a  0.916292  1.000000  0.888058
+c2q  0.818517  0.888058  1.000000
+
+##In_Degree Results
+
+          a2q       c2a       c2q
+a2q  1.000000  0.348399  0.895574
+c2a  0.348399  1.000000  0.356854
+c2q  0.895574  0.356854  1.000000
+
+##Out_Degree Results
+
+          a2q       c2a       c2q
+a2q  1.000000  0.680629  0.768511
+c2a  0.680629  1.000000  0.828503
+c2q  0.768511  0.828503  1.000000
+
+##Pagerank Results
+
+          a2q       c2a       c2q
+a2q  1.000000  0.314803  0.580683
+c2a  0.314803  1.000000  0.332786
+c2q  0.580683  0.332786  1.000000
+
+##Eigenvector Results
+
+          a2q       c2a       c2q
+a2q  1.000000  0.332726  0.734248
+c2a  0.332726  1.000000  0.376249
+c2q  0.734248  0.376249  1.000000
+
+##Coreness Results
+
+          a2q       c2a       c2q
+a2q  1.000000  0.822544  0.815956
+c2a  0.822544  1.000000  0.769515
+c2q  0.815956  0.769515  1.000000
+
+##Closeness Results
+
+          a2q       c2a       c2q
+a2q  1.000000  0.014503  0.416135
+c2a  0.014503  1.000000 -0.028063
+c2q  0.416135 -0.028063  1.000000
