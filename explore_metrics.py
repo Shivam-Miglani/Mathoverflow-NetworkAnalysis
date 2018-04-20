@@ -26,7 +26,7 @@ from methods import *
 
 # let's build the graph from our dataset, they are on data/ directory
 G1, G2, G3 = generate_all_aggregated_graphs(timeperiod=TIMEPERIOD, sample_ratio=SAMPLE_RATIO, directed=DIRECTED_GRAPH_FLAG,
-                                            allow_selfloop=ALLOW_SELFLOOP_FLAG)
+                                    allow_selfloop=ALLOW_SELFLOOP_FLAG)
 
 # print some information about the graph
 print(nx.info(G1))
