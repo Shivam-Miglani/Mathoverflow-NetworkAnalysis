@@ -18,3 +18,6 @@ To run it, do the following:
 1. Generate CSV files by running the `explore_metrics.py`.
 2. See the various coefficient using Rstudio by running the `calculate_correlation.R`.
 3. Enjoy!
+
+
+The folder /SNAP is a fork of Stanford's SNAP code. We edited the code to count centrality of node based upon its appearance in a motif. 
