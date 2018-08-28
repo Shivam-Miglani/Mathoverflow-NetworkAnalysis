@@ -1,6 +1,9 @@
 # Complex Networks Final Project
 
-This is the working repository for codes used in the Final Project of *EE4389 : Modeling and Data Analysis in Complex Networks* course of [TU Delft](https://www.tudelft.nl). The course is scheduled in Q3 of academic year 2017/18.
+This is the working repository for codes used in the Final Project of *EE4389 : Modeling and Data Analysis in Complex Networks* course of [TU Delft](https://www.tudelft.nl). The course is scheduled in Q3 of academic year 2017/18. 
+
+The dataset is a large temporal network of interactions (in terms of posting questions, answering questions and commenting) of users on MathOverflow taken from:
+https://snap.stanford.edu/data/sx-mathoverflow.html
 
 Datasets are splitted into 3 time periods:
 1. 1st Period: Tuesday, September 29, 2009 2:56:28 AM - Monday, November 21, 2011 1:44:28 PM (GMT)  
