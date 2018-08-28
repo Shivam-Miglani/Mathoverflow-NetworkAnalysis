@@ -1,5 +1,8 @@
 # Complex Networks Final Project
 
+For results and inferences please look at the presentation:
+https://docs.google.com/presentation/d/15cZOWtL55cwUMDv9kNJ1EqnEZP4Ew20Dh3XeWjz05k4/edit?usp=sharing
+
 This is the working repository for codes used in the Final Project of *EE4389 : Modeling and Data Analysis in Complex Networks* course of [TU Delft](https://www.tudelft.nl). The course is scheduled in Q3 of academic year 2017/18. 
 
 The dataset is a large temporal network of interactions (in terms of posting questions, answering questions and commenting) of users on MathOverflow taken from:
