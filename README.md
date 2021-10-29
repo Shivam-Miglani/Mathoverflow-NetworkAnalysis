@@ -1,5 +1,16 @@
 # Complex Networks Final Project
 
+Analyzed user behavior of MathOverflow users via Network Metrics and analyzing the motifs formed
+
+Network characteristics
+---
+![network-chars](network-char.png)
+
+
+Motif Analysis
+---
+![motif analysis](motifs.png)
+
 For results and inferences please look at the presentation:
 https://docs.google.com/presentation/d/15cZOWtL55cwUMDv9kNJ1EqnEZP4Ew20Dh3XeWjz05k4/edit?usp=sharing
 
